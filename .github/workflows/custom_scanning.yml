@@ -1,0 +1,42 @@
+name: CodeQL Analysis
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  codeql-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: javascript
+
+      - name: Build CodeQL database
+        run: codeql database create ./codeql-db
+
+      - name: Run CodeQL analysis
+        run: codeql database analyze ./codeql-db --format=sarif-latest > codeql-results.sarif
+
+      - name: Export CodeQL results
+        run: cp codeql-results.sarif ${{ github.workspace }}/codeql-results.sarif
+
+      - name: Create report
+        run: |
+          # Parse and format the SARIF file to generate a readable report
+          # Example commands to create a report file
+          # For instance, converting SARIF to HTML using `sarif2html` tool
+          # sarif2html codeql-results.sarif -o codeql-report.html
+          # or converting SARIF to CSV
+          # sarif2csv codeql-results.sarif -o codeql-report.csv
+
+      - name: Upload report artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: codeql-report
+          path: codeql-report.html # Or whatever the path to your report file is
